@@ -1,165 +1,110 @@
 <?php
 /**
- * @bucknelius
+ * @bucknelius 
  *  SELECT * FROM `orders` WHERE `payment_module_code` = 'cash' AND `date_purchased` LIKE '%2018-08-07%'
- * git status
- * git add filename.php
- * git commit -m "insert my comment here"
  */
- 
 
   require('includes/application_top.php');
-
   require(DIR_WS_CLASSES . 'currencies.php');
+
   error_reporting(-1);
   
   define('STRICT_ERROR_REPORTING', true);
+  define('NUMBER_OF_ROWS', 25);
+  
   $currencies = new currencies();
   $invoice_totals = array();
   $invoice_cogs_array = array();
-  //$_POST = array();
+  
 
-	$con=mysqli_connect("localhost","db_cuser","DBPassword!","db_drawercounter");
-
-	if (mysqli_connect_errno())
-	  {
-		echo "Failed to connect to MySQL: " . mysqli_connect_error();
-	  }
-	  if ($result=mysqli_query($con,$sql))
-  {
-	  while ($obj=mysqli_fetch_object($result))
-		{
-			//printf("%s \n",$obj->pebs_man_code);
-		}
-	  // Free result set
-	  mysqli_free_result($result);
-  }
-if(isset($_POST)){
+if(!empty($_POST)){
 	$messageIdent = md5($_POST['drawerdate_field'] . $_POST['hundos_field'] . $_POST['twenties_field'] . $_POST['comment_field']);
 	$sessionMessageIdent = isset($_SESSION['messageIdent'])?$_SESSION['messageIdent']:'';
 }
-if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate_field'] > 1)){//if its different:
-//if (isset($_POST['SubmitButton'])) {
-	//switch ($target) {
+if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate_field'] > 1)){		//if its different:
 		$_SESSION['messageIdent'] = $messageIdent;
-		//case 'drawerCountAction':
 			$currencies = new currencies();
-			//echo '<pre>asdfa';
-			
-			//print_r($_POST);
-			//echo '</pre>';
-			//$drawerdate = new DateTime('2000-01-01');
 			$drawerdate = $_POST['drawerdate_field'];
-			$drawerdate = str_replace("T", " ", $_POST['drawerdate_field']); //datetime-local 
-			
-			//build db insert query
+			$drawerdate = str_replace("T", " ", $_POST['drawerdate_field']); //datetime-local 		
 			$updatesql = "INSERT INTO `drawers` 
-			(`id`, 
-			`drawertype`,
-			`drawerdate`, 
-			`hundos`, 
-			`fifties`, 
-			`twenties`, 
-			`tens`, 
-			`fives`, 
-			`twos`, 
-			`ones`,
-			`qrolls`, 
-			`drolls`, 
-			`nrolls`, 
-			`prolls`, 
-			`odcoins`, 
-			`hdcoins`, 
-			`qcoins`, 
-			`dcoins`, 
-			`ncoins`, 
-			`pcoins`, 
-			`total`, 
-			`initials`, 
-			`comments`)
-			VALUES (NULL,'" .
-			$_POST['drawertype_field'] . "','" .
-			$drawerdate . "',' " .
-			$_POST['hundos_field'] . "','" .
-			$_POST['fifties_field'] . "','" .
-			$_POST['twenties_field'] . "','" . 
-			$_POST['tens_field'] . "','" . 
-			$_POST['fives_field'] . "','" . 
-			$_POST['twos_field'] . "','" . 
-			$_POST['ones_field'] . "','" . 
-			$_POST['qrolls_field'] . "','" . 
-			$_POST['drolls_field'] . "','" . 
-			$_POST['nrolls_field'] . "','" . 
-			$_POST['prolls_field'] . "','" . 
-			$_POST['odcoins_field'] . "','" . 
-			$_POST['hdcoins_field'] . "','" . 
-			$_POST['qcoins_field'] . "','" . 
-			$_POST['dcoins_field'] . "','" . 
-			$_POST['ncoins_field'] . "','" . 
-			$_POST['pcoins_field'] . "','" . 
-			$_POST['total_field'] . "','" . 
-			$_POST['initials_field'] . "','" . 
-			$_POST['comments_field'] . "')"; 
-			//$_POST['total_field'] . ")"; 
+			(`id`, `drawertype`, `drawerdate`, `hundos`, `fifties`, `twenties`, `tens`, `fives`, `twos`, `ones`, 
+			`qrolls`, `drolls`, `nrolls`, `prolls`, 
+			`odcoins`, `hdcoins`, `qcoins`, `dcoins`, `ncoins`, `pcoins`, 
+			`total`, `initials`,  `comments`)
+			VALUES (NULL,'" .  $_POST['drawertype_field'] . "','" .  $drawerdate . "',' " .  $_POST['hundos_field'] . "','" .  $_POST['fifties_field'] . "','" .  $_POST['twenties_field'] . "','" .  $_POST['tens_field'] . "','" .  $_POST['fives_field'] . "','" .  $_POST['twos_field'] . "','" .  $_POST['ones_field'] 
+			. "','" .  $_POST['qrolls_field'] . "','" .  $_POST['drolls_field'] . "','" .  $_POST['nrolls_field'] . "','" .  $_POST['prolls_field'] . "','" 
+			.  $_POST['odcoins_field'] . "','" .  $_POST['hdcoins_field'] . "','" .  $_POST['qcoins_field'] . "','" .  $_POST['dcoins_field'] . "','" .  $_POST['ncoins_field'] . "','" .  $_POST['pcoins_field'] . "','" 
+			.  $_POST['total_field'] . "','" .  $_POST['initials_field'] . "','" .  $_POST['comments_field'] . "')";  //$_POST['total_field'] . ")"; //build db insert query
 			
-			//echo $updatesql . '<br /><br />';
-			if ($con->query($updatesql) === TRUE) {
+			if ($db->Execute($updatesql) == TRUE) { // triple = is identical to and of the same type
 				echo "New record created successfully";
 			} else {
-				echo "Error: " . $updatesql . "<br>" . $con->error;
-				//echo '<br>INSERT INTO `drawers` (`id`, `drawerdate`, `hundos`, `fifties`, `twenties`, `tens`, `fives`, `twos`, `ones`, `Total`) VALUES (NULL, '2018-08-02 11:16:12', '', '', '', '', '', '', '', '');
-			}
+				echo "Error: " . $updatesql . "<br>" . $con->error;}
 			unset($_POST); //clear $_POST
 
-} //else{
-	//echo 'Duplicate entry';
-//}
-	$sql =  'SELECT * '
-        . ' from drawers d';
-		//. ' where 1';
-		$drawercountsarray = array();
-					//$sql = "SELECT * from product_machine where eastern_cat_code = '$eastern_cat_code'";
-		if ($result=mysqli_query($con,$sql)) //within foreach($exp_by_ln as $exl)
+	} 
+	global $db;
+	$sql =  'SELECT * FROM `drawers` ORDER By `drawerdate` DESC	LIMIT ' . NUMBER_OF_ROWS;
+	$drawercountsarray = array();
+	$result = $db->Execute($sql);
+	
+	/*echo '<pre>';
+	print_r($result);
+	echo '</pre>';*/
+	
+	if ($result->RecordCount() > 0) //within foreach($exp_by_ln as $exl)
 		  {
+			  $dateSortOrder = 0;
 				  // Fetch one and one row
-				   while ($row=mysqli_fetch_assoc($result)) //runs while the expression evaluates to TRUE
+				   //while ($row=mysqli_fetch_assoc($result)) //runs while the expression evaluates to TRUE //works w/ old db connection
+				   while (!$result->EOF) //runs while the expression evaluates to TRUE
 					{
-						//echo '<pre>';
-						//print_r($result);
-						//echo '</pre>';
-						$drawercountsarray[$row['id']]['id'] = $row['id'];
-						$drawercountsarray[$row['id']]['drawertype'] = $row['drawertype'];
-						$drawercountsarray[$row['id']]['drawerdate'] = $row['drawerdate'];
-						$drawercountsarray[$row['id']]['hundos'] = $row['hundos'];
-						//$drawercountsarray[$row['id']][] = $row['hundos'];
-						$drawercountsarray[$row['id']]['fifties'] = $row['fifties'];
-						$drawercountsarray[$row['id']]['twenties'] = $row['twenties'];
-						$drawercountsarray[$row['id']]['tens'] = $row['tens'];
-						$drawercountsarray[$row['id']]['fives'] = $row['fives'];
-						$drawercountsarray[$row['id']]['twos'] = $row['twos'];
-						$drawercountsarray[$row['id']]['ones'] = $row['ones'];
-						$drawercountsarray[$row['id']]['qrolls'] = $row['qrolls'];
-						$drawercountsarray[$row['id']]['drolls'] = $row['drolls'];
-						$drawercountsarray[$row['id']]['nrolls'] = $row['nrolls'];
-						$drawercountsarray[$row['id']]['prolls'] = $row['prolls'];
-						$drawercountsarray[$row['id']]['odcoins'] = $row['odcoins'];
-						$drawercountsarray[$row['id']]['hdcoins'] = $row['hdcoins'];
-						$drawercountsarray[$row['id']]['qcoins'] = $row['qcoins'];
-						$drawercountsarray[$row['id']]['dcoins'] = $row['dcoins'];
-						$drawercountsarray[$row['id']]['ncoins'] = $row['ncoins'];
-						$drawercountsarray[$row['id']]['pcoins'] = $row['pcoins'];
-						$drawercountsarray[$row['id']]['total'] = $row['total'];
-						$drawercountsarray[$row['id']]['initials'] = $row['initials'];
-						$drawercountsarray[$row['id']]['comments'] = $row['comments'];
+						/*echo '<pre>';
+						print_r($result);
+						echo '</pre>';*/
 						
-						//echo '<td>date is ' . $row['drawerdate'] . '</td>';
-						//echo '<td>date is ' . $drawerdate . '</td>';
-						//echo '<td>' . $hundos . '</td>';
-						//echo '<td>' . $fifties . '</td>';
-						//echo '</tr>';
-					}
-			mysqli_free_result($result);
-		  }
+						$dateSortOrder++;
+						//for($i = $result->fields['id'][0]; $result->fields['id'] > 0; $i--){
+						$drawercountsarray[$dateSortOrder]['id'] = $result->fields['id'];
+						$drawercountsarray[$dateSortOrder]['dateSortOrder'] = $dateSortOrder;
+						$drawercountsarray[$dateSortOrder]['drawertype'] = $result->fields['drawertype'];
+						$drawercountsarray[$dateSortOrder]['drawerdate'] = $result->fields['drawerdate'];
+						$drawercountsarray[$dateSortOrder]['hundos'] = $result->fields['hundos'];
+						//$drawercountsarray[$dateSortOrder][] = $result->fields['hundos'];
+						$drawercountsarray[$dateSortOrder]['fifties'] = $result->fields['fifties'];
+						$drawercountsarray[$dateSortOrder]['twenties'] = $result->fields['twenties'];
+						$drawercountsarray[$dateSortOrder]['tens'] = $result->fields['tens'];
+						$drawercountsarray[$dateSortOrder]['fives'] = $result->fields['fives'];
+						$drawercountsarray[$dateSortOrder]['twos'] = $result->fields['twos'];
+						$drawercountsarray[$dateSortOrder]['ones'] = $result->fields['ones'];
+						$drawercountsarray[$dateSortOrder]['qrolls'] = $result->fields['qrolls'];
+						$drawercountsarray[$dateSortOrder]['drolls'] = $result->fields['drolls'];
+						$drawercountsarray[$dateSortOrder]['nrolls'] = $result->fields['nrolls'];
+						$drawercountsarray[$dateSortOrder]['prolls'] = $result->fields['prolls'];
+						$drawercountsarray[$dateSortOrder]['odcoins'] = $result->fields['odcoins'];
+						$drawercountsarray[$dateSortOrder]['hdcoins'] = $result->fields['hdcoins'];
+						$drawercountsarray[$dateSortOrder]['qcoins'] = $result->fields['qcoins'];
+						$drawercountsarray[$dateSortOrder]['dcoins'] = $result->fields['dcoins'];
+						$drawercountsarray[$dateSortOrder]['ncoins'] = $result->fields['ncoins'];
+						$drawercountsarray[$dateSortOrder]['pcoins'] = $result->fields['pcoins'];
+						$drawercountsarray[$dateSortOrder]['total'] = $result->fields['total'];
+						$drawercountsarray[$dateSortOrder]['initials'] = $result->fields['initials'];
+						$drawercountsarray[$dateSortOrder]['comments'] = $result->fields['comments']; //
+						$drawercountsarray[$dateSortOrder]['lastbalance'] = ''; //
+						$drawercountsarray[$dateSortOrder]['drawerpulls'] = ''; //
+						//$drawercountsarray[$result->fields['dateSortOrder']]['comments'] = $result->fields[0]['id']; // 
+						//}
+					
+						//echo 'turd ' . $i++ . '</br>';
+						
+						$result -> MoveNext (); //new for zen-cart db // Does not... //works w/ old db connection
+					} //close while
+		  } else {
+			echo '<p>Sorry, no currencies found.</p>';
+		}
+		/*echo '<pre>drawer counter:';
+		print_r($drawercountsarray);
+		echo '</pre>';*/
 ?>
 
 <!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -215,22 +160,73 @@ function totalit(){
 <?php require(DIR_WS_INCLUDES . 'header.php'); ?>
 <!-- header_eof //-->
 <!-- body //-->
+<p id="finalcountdown" align="center"></p>
 <form action="" method="post">
 <table class="table" name="table2" border="1" style="width: 3500px;" cellspacing="0" cellpadding="0">
 <tbody>
+
 <colgroup>
  <col width="20">
  <col width="30">
  <col width="10">
 </colgroup>
+
+<script>
+// Set the date we're counting down to
+//var countDownDate = new Date().getTime();
+//countDownDate = countDownDate.setSeconds(getSeconds() + 90);
+
+	var countDownDate = new Date();
+	countDownDate.setSeconds(countDownDate.getSeconds() + 900);
+
+	//var countDownDate = countDownDate.setSeconds(countDownDate.getSeconds() + 90);
+
+	// Update the count down every 1 second
+	var x = setInterval(function() {
+
+		// Get todays date and time
+		var now = new Date().getTime();
+		
+		// Find the distance between now and the count down date
+		var distance = countDownDate - now;
+		
+		// Time calculations for days, hours, minutes and seconds
+		var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+		var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+		var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+		
+		// Output the result in an element with id="finalcountdown"
+		//document.getElementById("finalcountdown").innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+		document.getElementById("finalcountdown").innerHTML = "time you have to count the drawer " + minutes + "m " + seconds + "s ";
+		
+		// If the count down is over, write some text 
+		if (distance < 0) {
+			clearInterval(x);
+			document.getElementById("finalcountdown").innerHTML = "SESSION EXPIRED AFTER 15 minutes - OPEN ADMIN IN ANOTHER TAB BEFORE SUBMITTING COUNTS";
+		}
+	}, 1000);
+</script>
 <script>
 $(document).keydown(
     function(e)
     {    
+		//select all text on over keys
+	        $(function () {
+            var focusedElement;
+            $(document).on('focus', 'input', function () {
+                if (focusedElement == this) return; //already focused, return so user can now place cursor at specific point in input.
+                focusedElement = this;
+                setTimeout(function () { focusedElement.select(); }, 50); //select all text in any field on focus for easy re-entry. Delay sightly to allow focus to "stick" before selecting.
+            });
+        });
+	
         if (e.keyCode == 39) {      
 			//alert("smell my rubber fingers");
 			//alert().nextAll('input');
-            $(".move:focus").parent().next().find('input').focus();
+            
+			$(".move:focus").parent().next().find('input').focus(); 
+			
 
         }
         if (e.keyCode == 37) {      
@@ -247,99 +243,45 @@ $(document).keydown(
 	 <td class="pageHeading" valign="right" align="center" colspan="6"><?php echo 'Coins'; ?></td>
   </tr>
   <tr class="fixed_headers" >
-	 <td class="id"></td>
+	 <!--<td class="id"></td>--><!-- id is the id from the db value id, sortid is the value from the loop sorted by date-->
+	 <td class="sortid"></td>
 	 <div class="header">
 	 <td class="drawertype">Type</td>
 	 <td class="pageHeading date" style="width: 151px;"> Date</span></td>
-	 <td class="pageHeading bills" width="5%" style="text-align: center; width: 5px;">100's</td>
-	 <td class="pageHeading bills" width="10px;">50's</td>
-	 <td class="pageHeading bills" style="text-align: center; width: 10px;">20's</td>
-	 <td class="pageHeading bills" style="text-align: center; width: 10px;">10's</td>
-	 <td class="pageHeading bills" style="text-align: center; width: 10px;">5's</td>
-	 <td class="pageHeading bills" style="text-align: center; width: 10px;">2's</td>
-	 <td class="pageHeading bills" style="text-align: center; width: 10px;">1's</td>
+	 <td class="pageHeading bills" style="text-align: center; width: 4%;">2's</td>
+	 <td class="pageHeading bills" width="5%" style="text-align: center;">100's</td>
+	 <td class="pageHeading bills" width="4%">50's</td>
+	 <td class="pageHeading bills" style="text-align: center; width: 4%;">20's</td>
+	 <td class="pageHeading bills" style="text-align: center; width: 4%;">10's</td>
+	 <td class="pageHeading bills" style="text-align: center; width: 4%;">5's</td>
+	 <td class="pageHeading bills" style="text-align: center; width: 4%;">1's</td>
 	 <td class="pageHeading" style="text-align: center; width: 5px;">Q-rolls</td>
-	 <td class="pageHeading" style="text-align: center; width: 10px;">D-rolls</td>
-	 <td class="pageHeading" style="text-align: center; width: 10px;">N-rolls</td>
-	 <td class="pageHeading" style="text-align: center; width: 10px;">P-rolls</td>
-	 <td class="pageHeading" style="text-align: center; width: 10px;">$1-coins</td>
-	 <td class="pageHeading" style="text-align: center; width: 10px;">$.5-coins</td>
-	 <td class="pageHeading" style="font-size:12px; text-align: center; width: 10px;">Quarter-coins</td>
-	 <td class="pageHeading" style="text-align: center; width: 10px;">Dimes</td>
-	 <td class="pageHeading" style="font-size:12px; text-align: center; width: 10px;">Nickles</td>
-	 <td class="pageHeading" style="font-size:12px; text-align: center; width: 10px;">Pennies</td>
-	 <td class="pageHeading" style="text-align: center; width: 10px;">Total</td>
-	 <td class="pageHeading" style="text-align: center; width: 10px;">Initials</td>
-	 <td class="pageHeading" style="text-align: center; width: 10px;">Comments</td>
-	 <td class="pageHeading" style="text-align: center; width: 10px;">Close</td>
+	 <td class="pageHeading" style="text-align: center; width: 4%;">D-rolls</td>
+	 <td class="pageHeading" style="text-align: center; width: 4%;">N-rolls</td>
+	 <td class="pageHeading" style="text-align: center; width: 4%;">P-rolls</td>
+	 <td class="pageHeading" style="text-align: center; width: 4%;">$1-coins</td>
+	 <td class="pageHeading" style="text-align: center; width: 4%;">$.5-coins</td>
+	 <td class="pageHeading" style="font-size:12px; text-align: center; width: 4%;">Quarter-coins</td>
+	 <td class="pageHeading" style="text-align: center; width: 4%;">Dimes</td>
+	 <td class="pageHeading" style="font-size:12px; text-align: center; width: 4%;">Nickles</td>
+	 <td class="pageHeading" style="font-size:12px; text-align: center; width: 4%;">Pennies</td>
+	 <td class="pageHeading" style="text-align: center; width: 4%;">Total</td>
+	 <td class="pageHeading" style="text-align: center; width: 4%;">Initials</td>
+	 <td class="pageHeading" style="text-align: center; width: 4%;">Comments</td>
+	 <td class="pageHeading" style="text-align: center; width: 50%;">Variance</td>
 	 </div>
   </tr>
 
   <tr>
 <?php
-/*echo '<pre>bdbdbd';
-//print_r($drawercountsarray);
+/*echo '<pre>drawercountsarray:';
+print_r($drawercountsarray);
 echo '</pre>';*/
-$eachDrawerDateArray = array();
 
-	foreach($drawercountsarray as $drawercountday){
-	echo '<tr>';
-	echo '<td class="id">' . $drawercountday['id']. '</td>';
-	echo '<td class="drawertype">' . $drawercountday['drawertype']. '</td>';
-	echo '<td class="date">' . zen_datetime_long($drawercountday['drawerdate']). '</td>';
-	echo '<td class="billnums nums" id="hun">' . $drawercountday['hundos']. '</td>';
-	echo '<td class="billnums nums" id="fif">' . $drawercountday['fifties']. '</td>';
-	echo '<td class="billnums nums" id="twen">' . $drawercountday['twenties']. '</td>';
-	echo '<td class="billnums nums" id="te">' . $drawercountday['tens']. '</td>';
-	echo '<td class="billnums nums" id="fiv">' . $drawercountday['fives']. '</td>';
-	echo '<td class="billnums nums" id="two">' . $drawercountday['twos']. '</td>';
-	echo '<td class="billnums nums" id="one">' . $drawercountday['ones']. '</td>';
-	echo '<td class="nums" id="qr">' . $drawercountday['qrolls']. '</td>';
-	echo '<td class="nums" id="dr">' . $drawercountday['drolls']. '</td>';
-	echo '<td class="nums" id="nr">' . $drawercountday['nrolls']. '</td>';
-	echo '<td class="nums" id="pr">' . $drawercountday['prolls']. '</td>';
-	echo '<td class="coinnums nums" id="od">' . $drawercountday['odcoins']. '</td>';
-	echo '<td class="coinnums nums" id="hd">' . $drawercountday['hdcoins']. '</td>';
-	echo '<td class="coinnums nums" id="qc">' . $drawercountday['qcoins']. '</td>';
-	echo '<td class="coinnums nums" id="dc">' . $drawercountday['dcoins']. '</td>';
-	echo '<td class="coinnums nums" id="nc">' . $drawercountday['ncoins']. '</td>';
-	echo '<td class="coinnums nums" id="pc">' . $drawercountday['pcoins']. '</td>';
-	echo '<td id="tot">' . $drawercountday['total']. '</td>';
-	echo '<td id="initals">' . $drawercountday['initials']. '</td>';
-	echo '<td id="com">' . $drawercountday['comments']. '</td>';
-	
-	//echo '<td id="close">' . date_format(zen_datetime_long($drawercountday['drawerdate']),'%%Y%%m%%d') . '</td>';
-	echo '<td id="close">' . date("Y-m-d", strtotime($drawercountday['drawerdate'])) . '</td>';
-	//echo '<td>' . $drawercountday['one-rolls']. '</td>';
-	$dayinquestion = strtotime($drawercountday['drawerdate']);
-	$dayinquestion = date("Y-m-d", strtotime($drawercountday['drawerdate']));
-	//$sql = "";
-	//$db->Execute($sql);
-	/*if(!isset($eachDrawerDateArray[date("Y-m-d", $dayinquestion)])){
-		if($drawercountday['drawertype'] == 'open'){
-			$eachDrawerDateArray[date("Y-m-d", $dayinquestion]['open'])] = $drawercountday['total'];
-		}
-		elseif($drawercountday['drawertype'] == 'close'){
-			$eachDrawerDateArray[date("Y-m-d", $dayinquestion]['close'])] = $drawercountday['total'];
-		}
-	
-		//query sql for drawerdate sales here
-		
-		$variance = $variance - $eachDrawerDateArray[date("Y-m-d", strtotime($drawercountday['drawerdate']))]['close'] - $eachDrawerDateArray[date("Y-m-d", strtotime($drawercountday['drawerdate']))]['open']
-	}*/
-	
-	//echo '<td>' . $drawercountday['drawerdate']. '</td>';
-	echo '</tr>';
-}
 
-print_r($dayinquestion);
-
-?>
-  </tr>
- 
-<!-- body_text_eof //-->
-  </tr>
-<?php
+//##################################################################################################################################################################
+// PRINT INPUT FIELDS
+//##################################################################################################################################################################
 $drawertypeoptions = array(
 	array('id' => 'open', 'text' => 'open'),
 	array('id' => 'close', 'text' => 'close'),
@@ -350,52 +292,201 @@ $drawertypeoptions = array(
 	array('id' => 'ownersdraw', 'text' => 'Owner\'s Draw'),
 	array('id' => 'other', 'text' => 'other')
 	);
-echo '<tr>';
-//echo '<td>';
-$timestamp = date("Y-m-d\TH:i:s");
-echo '<td class="id"></td>';
-echo '<td class="drawertype">' . zen_draw_pull_down_menu('drawertype_field', $drawertypeoptions, '0') . '</td>';
-echo '<td class="date dateinputcell"><input class="date dateinput" type="datetime-local" name= "drawerdate_field" value="' . $timestamp . '"></td>';
-echo '<td class="numinputs bills">' . zen_draw_input_field('hundos_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="hundos" length="8"') . '</td>';
-echo '<td class="numinputs bills">' . zen_draw_input_field('fifties_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="fifties" length="8"') . '</td>';
-echo '<td class="numinputs bills">' . zen_draw_input_field('twenties_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="twenties" length="8"') . '</td>';
-echo '<td class="numinputs bills">' . zen_draw_input_field('tens_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="tens" length="8"') . '</td>';
-echo '<td class="numinputs bills">' . zen_draw_input_field('fives_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="fives" length="8"') . '</td>';
-echo '<td class="numinputs bills">' . zen_draw_input_field('twos_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="twos" length="8"') . '</td>';
-echo '<td class="numinputs bills">' . zen_draw_input_field('ones_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="ones" length="8"') . '</td>';
-echo '<td class="numinputs coinrolls">' . zen_draw_input_field('qrolls_field', '', 'onkeyup=totalit(); class="move numinputs rollsinput" id="qrolls" length="8"') . '</td>';
-echo '<td class="numinputs coinrolls">' . zen_draw_input_field('drolls_field', '', 'onkeyup=totalit(); class="move numinputs rollsinput" id="drolls" length="8"') . '</td>';
-echo '<td class="numinputs coinrolls">' . zen_draw_input_field('nrolls_field', '', 'onkeyup=totalit(); class="move numinputs rollsinput" id="nrolls" length="8"') . '</td>';
-echo '<td class="numinputs coinrolls">' . zen_draw_input_field('prolls_field', '', 'onkeyup=totalit(); class="move numinputs rollsinput" id="prolls" length="8"') . '</td>';
-echo '<td class="numinputs coins">' . zen_draw_input_field('odcoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="odcoins" length="8"') . '</td>';
-echo '<td class="numinputs coins">' . zen_draw_input_field('hdcoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="hdcoins" length="8"') . '</td>';
-echo '<td class="numinputs coins">' . zen_draw_input_field('qcoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="qcoins" length="8"') . '</td>';
-echo '<td class="numinputs coins">' . zen_draw_input_field('dcoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="dcoins" length="8"') . '</td>';
-echo '<td class="numinputs coins">' . zen_draw_input_field('ncoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="ncoins" length="8"') . '</td>';
-echo '<td class="numinputs coins">' . zen_draw_input_field('pcoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="pcoins" length="8"') . '</td>';
-echo '<td>' . zen_draw_input_field('total_field', '', 'onkeyup=totalit(); id="total" length="8" required') . '</td>';
-echo '<td>' . zen_draw_input_field('initials_field', '', 'length="8" required') . '</td>';
-echo '<td>' . zen_draw_input_field('comments_field', '', 'length="8"') . '</td>';
+	echo '<tr>';
+	//echo '<td>';
+	$timestamp = date("Y-m-d\TH:i:s");
+	echo '<td class="id"></td>';
+	echo '<td class="drawertype">' . zen_draw_pull_down_menu('drawertype_field', $drawertypeoptions, '0') . '</td>';
+	echo '<td class="date dateinputcell"><input class="date dateinput" type="datetime-local" name= "drawerdate_field" value="' . $timestamp . '"></td>';
+	echo '<td class="numinputs bills">' . zen_draw_input_field('twos_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="twos" length="8"') . '</td>';
+	echo '<td class="numinputs bills">' . zen_draw_input_field('hundos_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="hundos" length="8"') . '</td>';
+	echo '<td class="numinputs bills">' . zen_draw_input_field('fifties_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="fifties" length="8"') . '</td>';
+	echo '<td class="numinputs bills">' . zen_draw_input_field('twenties_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="twenties" length="8"') . '</td>';
+	echo '<td class="numinputs bills">' . zen_draw_input_field('tens_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="tens" length="8"') . '</td>';
+	echo '<td class="numinputs bills">' . zen_draw_input_field('fives_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="fives" length="8"') . '</td>';
+	echo '<td class="numinputs bills">' . zen_draw_input_field('ones_field', '', 'onkeyup=totalit(); class="move numinputs billsinput" id="ones" length="8"') . '</td>';
+	echo '<td class="numinputs coinrolls">' . zen_draw_input_field('qrolls_field', '', 'onkeyup=totalit(); class="move numinputs rollsinput" id="qrolls" length="8"') . '</td>';
+	echo '<td class="numinputs coinrolls">' . zen_draw_input_field('drolls_field', '', 'onkeyup=totalit(); class="move numinputs rollsinput" id="drolls" length="8"') . '</td>';
+	echo '<td class="numinputs coinrolls">' . zen_draw_input_field('nrolls_field', '', 'onkeyup=totalit(); class="move numinputs rollsinput" id="nrolls" length="8"') . '</td>';
+	echo '<td class="numinputs coinrolls">' . zen_draw_input_field('prolls_field', '', 'onkeyup=totalit(); class="move numinputs rollsinput" id="prolls" length="8"') . '</td>';
+	echo '<td class="numinputs coins">' . zen_draw_input_field('odcoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="odcoins" length="8"') . '</td>';
+	echo '<td class="numinputs coins">' . zen_draw_input_field('hdcoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="hdcoins" length="8"') . '</td>';
+	echo '<td class="numinputs coins">' . zen_draw_input_field('qcoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="qcoins" length="8"') . '</td>';
+	echo '<td class="numinputs coins">' . zen_draw_input_field('dcoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="dcoins" length="8"') . '</td>';
+	echo '<td class="numinputs coins">' . zen_draw_input_field('ncoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="ncoins" length="8"') . '</td>';
+	echo '<td class="numinputs coins">' . zen_draw_input_field('pcoins_field', '', 'onkeyup=totalit(); class="move numinputs coinsinput" id="pcoins" length="8"') . '</td>';
+	echo '<td>' . zen_draw_input_field('total_field', '', 'onkeyup=totalit(); class="move" id="total" length="8" required') . '</td>';
+	echo '<td>' . zen_draw_input_field('initials_field', '', 'class="move" length="8" required') . '</td>';
+	echo '<td>' . zen_draw_input_field('comments_field', '', 'class="move" length="8"') . '</td>';
+	echo '<td><div class="buttonRow forward"><input type="submit" name="SubmitButton"/></div></td></form>';
+	echo '</tr>';
+	//echo '</form>'; //assumed duplicate
 
 
+//##################################################################################################################################################################
+// DISPLAY SQL QUERY RESULTS FIELDS
+//##################################################################################################################################################################
 
+/*echo '<pre>de drawercountsarray:';
+print_r($drawercountsarray);
+echo '</pre>';*/
+
+//$eachDrawerDateArray = array();
+		$drawerpulls = 0;
+		$j = 0;
+	foreach($drawercountsarray as $key => $v){ //https://stackoverflow.com/questions/28216877/add-values-to-an-array-inside-a-foreach-loop
+	//foreach($key[$v]rawercountsarray as $key[$v]){ //https://stackoverflow.com/questions/28216877/add-values-to-an-array-inside-a-foreach-loop
+		//$i = $key['dateSortOrder'];
+		$i = $dateSortOrder;
+		$lastbalance = 0;
+
+		echo '<br />$i is ' . $i . ' - $key is ' . $key . '<br />';
+		echo  $v['drawertype'] . ' - '; //'$key[$v][\'drawertype\'] is ' .
+		echo '[$v] drawerdate is ' . $v[drawerdate] . '<br />';
+		//$key[$v]++;
+		
+		if($v['drawertype'] == 'drawerpurchase' || $v['drawertype'] == 'ownersdraw'){
+			$j--;
+			$k--;
+			//$drawerpulls += $drawercountsarray[$i]['total'];
+			$drawerpulls += $v['total'];
+			echo '$j is ' . $j . ' $drawerpulls is ' . $drawerpulls . '<br />';
+		}
+		
+		do{
+			$key++;
+			$i++;
+			
+			echo $v['total'] . '<br />';
+			//echo '<pre>' . print_r($v) . '</pre>';
+			//$lastbalance = $key[$v]['total'];
+			//$lastbalance = $key[$i]['total'];
+			$lastbalance = $v['total'];
+			//$lastbalance = $drawercountsarray[$i]['total'];
+			//$lastbalance = $total;
+			echo 'key is ' . $key . ' - lastbalance is ' . $lastbalance . '<br />';
+
+		//} while(($key[$v]['drawertype'] != 'open' && $key[$v]['drawertype'] != 'close') && $key < NUMBER_OF_ROWS);
+		} while(($v['drawertype'] != 'open' && $v['drawertype'] != 'close') && $key < NUMBER_OF_ROWS);
+			
+		$drawercountsarray[[$v][dateSortOrder]]['lastbalance'] = $lastbalance;
+
+		
+		if(empty([$v]['lastbalance'])){
+			//echo '<br />empty($key[$v][\'dateSortOrder\'][\'lastbalance\']) is empty for ' . empty($key[$v]['lastbalance']);
+		}else{
+			echo 'YESSSSSS ' . [$v]['lastbalance'];
+		}		
+		
+		$j++;
+		//$drawercountsarray[[$j][dateSortOrder]]['drawerpulls'] = $drawerpulls;
+		$drawercountsarray[$j]['drawerpulls'] = $drawerpulls;
+	}
+	
+		echo '<pre>drawercountsarray is ' . $i;
+		print_r($drawercountsarray);
+		echo '</pre>';
+		
+	
+	
+	foreach($drawercountsarray as $drawerday){
+	//foreach($drawercountsarray as $drawercountday){ //how it was
+		
+		//$i++;
+		$i = $drawerday['dateSortOrder'];
+		//$index = '';
+		$lastbalance = '';
+		echo '<tr>';
+		//echo '<td class="id">' . $drawerday['id']. '</td>';
+		echo '<td class="id">' . $drawerday['dateSortOrder']. '</td>';
+		echo '<td class="drawertype">' . $drawerday['drawertype']. '</td>';
+		$dayofweek = date('w', strtotime($drawerday['drawerdate']));
+		$days = array('Sunday', 'Monday', 'Tuesday', 'Wednesday','Thursday','Friday', 'Saturday');
+		echo '<td class="date"> <div class="date" style="text-align: left; width:50px;">' . $days[$dayofweek] . '</div>           <div class="date"> ' . zen_datetime_long($drawerday['drawerdate']). '</div></td>';
+		//$dayofweek = date('w', strtotime($drawerday['drawerdate']));
+		//$dayofweek    = date('Y-m-d', strtotime(($day - $dayofweek).' day', strtotime($date)));
+		echo '<td class="billnums nums" id="two">' . $drawerday['twos']. '</td>';
+		echo '<td class="billnums nums" id="hun">' . $drawerday['hundos']. '</td>';
+		echo '<td class="billnums nums" id="fif">' . $drawerday['fifties']. '</td>';
+		echo '<td class="billnums nums" id="twen">' . $drawerday['twenties']. '</td>';
+		echo '<td class="billnums nums" id="te">' . $drawerday['tens']. '</td>';
+		echo '<td class="billnums nums" id="fiv">' . $drawerday['fives']. '</td>';
+		echo '<td class="billnums nums" id="one">' . $drawerday['ones']. '</td>';
+		echo '<td class="nums" id="qr">' . $drawerday['qrolls']. '</td>';
+		echo '<td class="nums" id="dr">' . $drawerday['drolls']. '</td>';
+		echo '<td class="nums" id="nr">' . $drawerday['nrolls']. '</td>';
+		echo '<td class="nums" id="pr">' . $drawerday['prolls']. '</td>';
+		echo '<td class="coinnums nums" id="od">' . $drawerday['odcoins']. '</td>';
+		echo '<td class="coinnums nums" id="hd">' . $drawerday['hdcoins']. '</td>';
+		echo '<td class="coinnums nums" id="qc">' . $drawerday['qcoins']. '</td>';
+		echo '<td class="coinnums nums" id="dc">' . $drawerday['dcoins']. '</td>';
+		echo '<td class="coinnums nums" id="nc">' . $drawerday['ncoins']. '</td>';
+		echo '<td class="coinnums nums" id="pc">' . $drawerday['pcoins']. '</td>';
+		echo '<td id="tot">' . $drawerday['total']. '</td>';
+		echo '<td id="initals">' . $drawerday['initials']. '</td>';
+		echo '<td id="com">' . $drawerday['comments']. '</td>';
+		
+		$variance = $drawercountsarray[$i]['total'] - $drawercountsarray[$i]['lastbalance'] - $drawercountsarray[$i]['drawerpulls'];
+		
+		$drawercountsarray[$dateSortOrder]['variance'] = $variance;
+		
+		echo '<td id="variance" bordercolor = "white">';
+	if($drawerday['drawertype'] == 'open' || $drawerday['drawertype'] == 'close'){
+			echo '<div class="variance">' . sprintf("% 8.2f", $drawercountsarray[$i]['total']) . '</div>' .				
+				' - <div class="variance">' . sprintf("% 8.2f", $drawercountsarray[$i]['lastbalance']) .  '</div>' .
+				' - <div class="variance">' . sprintf("% 8.2f", $drawercountsarray[$i]['drawerpulls']) .  '</div>' .
+				' = <div class="variance">' . sprintf("% 8.2f", $variance) . '</div>';	
+		echo '<td>last open/close amt</td>';
+	}
+	echo '</td>';
+		$dayinquestion = strtotime($drawerday['drawerdate']);
+		$dayinquestion = date("Y-m-d", strtotime($drawerday['drawerdate']));
+		echo '</tr>';
+	}
+
+echo '<tr><td></td><td colspan = "100%">Brian moved the input fields to the top (first row of this table; below the headers)</td></tr>';
+
+
+//print_r($dayinquestion);
+
+?>
+  </tr>
+ 
+<!-- body_text_eof //-->
+  </tr>
+
+
+<?php
 //echo '<td>' . zen_draw_input_field('total_field', '0', 'length="8"') . '</td>';
-echo '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="buttonRow forward"><input type="submit" name="SubmitButton"/></div><td><tr>';
-echo '</tr></form>';
+
 ?>
   </tbody>
 </table>
 <!-- body_eof //-->
+<?php
+/*echo 'drawercountsarray 2 total is ' . $drawercountsarray[2]['total'];
+echo '<pre>eachDrawerDateArray: ';
+print_r($eachDrawerDateArray);
+echo '</pre>';*/
 
+?>
 
 <style>
     .table {
         display: block;
         max-width: 100%;
 		align: center;
-		<!--max-height: 100%;-->
-        overflow: scroll; <!-- Available options: visible, hidden, scroll, auto -->
+		padding: 0px;
+		vertical-align: middle;
+		overflow: scroll; <!-- Available options: visible, hidden, scroll, auto -->
     }
+	table, td{
+		vertical-align: middle !important;
+	}
+	table, td.pageHeading.dateinput {
+		font-size:9px !important;
+		max-width: 2.6%
+	}
 	.pageHeading {
 		background: lightgrey;
 	}
@@ -404,40 +495,39 @@ echo '</tr></form>';
 	}
 	.id{
 		padding: 0px !important;
-		max-width: 15px;
+		max-width: 1%;
 	}
 	.drawertype{
-		max-width: 65px;
+		max-width: 4%;
 	}
 	.date {
-		padding: 0px !important;
-		padding-top: 12px !important;		
-		max-width: 165px;
+		padding: 0px !important;		
 	}
-	.dateinput {
-		font-size:9px !important;
-	}
+
 	.dateinputcell{
 		padding: 0px !important;
 		padding-top: 8px !important;
+
+	}
+	.dateinput{
+		vertical-align: middle !important;
 	}
 	.bills {
 		padding: 0px !important;
-		max-width: 70px;
+		max-width: 4%;
 		color: green;
 	}
 	.coinrolls {
 		padding: 0px !important;
-		max-width: 70px;
+		max-width: 4%;
 	}
 	.coins {
 		padding: 0px !important;
-		max-width: 70px;
+		max-width: 4%
 	}
 	.numinputs{
 		padding: 0px !important;
-		max-width: 45px;
-		padding: 0px;
+		text-align: center;
 	}
 	.nums{
 		padding: 0px !important;
@@ -453,7 +543,16 @@ echo '</tr></form>';
 		padding: 0px !important;
 		padding-top: 12px !important;
 		background-color: silver;
-		max-width: 75px !important;
+		max-width: 4%;
+	}
+	div.variance{
+		width: 40px;
+		display: inline-table;
+		text-align: right;
+	}
+	div.date{
+		display: inline-table;
+		text-align: right;
 	}
 @header_background_color: #333;
 @header_text_color: #FDFDFD;
