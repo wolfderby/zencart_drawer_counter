@@ -90,8 +90,8 @@ if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate
 						$drawercountsarray[$dateSortOrder]['total'] = $result->fields['total'];
 						$drawercountsarray[$dateSortOrder]['initials'] = $result->fields['initials'];
 						$drawercountsarray[$dateSortOrder]['comments'] = $result->fields['comments']; //
-						$drawercountsarray[$dateSortOrder]['lastbalance'] = ''; //
-						$drawercountsarray[$dateSortOrder]['drawerpulls'] = ''; //
+						$drawercountsarray[$dateSortOrder]['lastopenclose'] = ''; //
+						$drawercountsarray[$dateSortOrder]['negations'] = ''; //
 						//$drawercountsarray[$result->fields['dateSortOrder']]['comments'] = $result->fields[0]['id']; // 
 						//}
 					
@@ -332,56 +332,119 @@ print_r($drawercountsarray);
 echo '</pre>';*/
 
 //$eachDrawerDateArray = array();
-		$drawerpulls = 0;
+		$negations = 0;
 		$j = 0;
 	foreach($drawercountsarray as $key => $v){ //https://stackoverflow.com/questions/28216877/add-values-to-an-array-inside-a-foreach-loop
-	//foreach($key[$v]rawercountsarray as $key[$v]){ //https://stackoverflow.com/questions/28216877/add-values-to-an-array-inside-a-foreach-loop
-		//$i = $key['dateSortOrder'];
-		$i = $dateSortOrder;
-		$lastbalance = 0;
 
-		echo '<br />$i is ' . $i . ' - $key is ' . $key . '<br />';
-		echo  $v['drawertype'] . ' - '; //'$key[$v][\'drawertype\'] is ' .
-		echo '[$v] drawerdate is ' . $v[drawerdate] . '<br />';
-		//$key[$v]++;
-		
-		if($v['drawertype'] == 'drawerpurchase' || $v['drawertype'] == 'ownersdraw'){
+	//initialize variables for each $key/$i
+		//$i = $v['dateSortOrder'];
+		$lastopenclose = 0;
+		$negations = 0;
+		echo '<br /><br />---111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111<br />';
+	echo '<br />$i (array/row index) is ' . $i . '$j (hopeful index of last open/close) is ' . $j . ' - $key is ' . $key . '<br />';
+	echo  $v['drawertype'] . ' - '; //'$key[$v][\'drawertype\'] is ' .
+	echo '[$v] drawerdate is ' . $v[drawerdate] . '<br />';
+	
+		/*if($v['drawertype'] == 'drawerpurchase' || $v['drawertype'] == 'ownersdraw'){
 			$j--;
 			$k--;
-			//$drawerpulls += $drawercountsarray[$i]['total'];
-			$drawerpulls += $v['total'];
-			echo '$j is ' . $j . ' $drawerpulls is ' . $drawerpulls . '<br />';
-		}
-		
-		do{
-			$key++;
-			$i++;
-			
-			echo $v['total'] . '<br />';
-			//echo '<pre>' . print_r($v) . '</pre>';
-			//$lastbalance = $key[$v]['total'];
-			//$lastbalance = $key[$i]['total'];
-			$lastbalance = $v['total'];
-			//$lastbalance = $drawercountsarray[$i]['total'];
-			//$lastbalance = $total;
-			echo 'key is ' . $key . ' - lastbalance is ' . $lastbalance . '<br />';
-
-		//} while(($key[$v]['drawertype'] != 'open' && $key[$v]['drawertype'] != 'close') && $key < NUMBER_OF_ROWS);
-		} while(($v['drawertype'] != 'open' && $v['drawertype'] != 'close') && $key < NUMBER_OF_ROWS);
-			
-		$drawercountsarray[[$v][dateSortOrder]]['lastbalance'] = $lastbalance;
-
-		
-		if(empty([$v]['lastbalance'])){
-			//echo '<br />empty($key[$v][\'dateSortOrder\'][\'lastbalance\']) is empty for ' . empty($key[$v]['lastbalance']);
+			//$negations += $drawercountsarray[$i]['total'];
+			$negations += $v['total'];
+			echo '$j is ' . $j . ' $negations is ' . $negations . '<br />';
 		}else{
-			echo 'YESSSSSS ' . [$v]['lastbalance'];
+			$j++;
+			$negations = 0;
+		}*/
+		
+		//(do while) loop to look for next open/close and set as lastopenclose
+		//drawer types are open, close, deposit, drawer purchase, owners draw, owners contribution, other
+		
+		//types that are a statement of current balance open close
+		
+		//types that increase amount in drawer -- owners contribution (possibly other)
+				//yet to be developed cash sales between 2 open/closes
+		
+		//types that decrease amount in drawer -- deposit, drawer purchase (possibly other)
+		
+		//calculate variance by
+ 		//$variance = $drawercountsarray[$i]['total'] - $drawercountsarray[$i]['lastopenclose'] - $drawercountsarray[$i]['negations'];
+ 		//$variance = $drawercountsarray[$i]['beginbal'] - $drawercountsarray[$i]['negations'] + $drawercountsarray[$i]['contributions'] - drawercountsarray[$i]['lastopenclose'];
+		
+		//type = open -- drawercountsarray[1]['total'] = $100
+		
+		//type = drawer purchase = drawercountsarray[2]['total'] 1.07
+		
+		//type = drawer purchase = drawercountsarray[3]['total'] 25
+		
+		//type = drawer purchase = drawercountsarray[4]['total'] 126.07
+		
+		//looks ahead in the array
+
+		//do{
+		//for($j = $key; (($v['drawertype'] != 'open' && $v['drawertype'] != 'close') && $key < NUMBER_OF_ROWS); $k++) {
+		for($i = $key; (($drawercountsarray[$i]['drawertype'] != 'open' && $drawercountsarray[$i]['drawertype'] != 'close') && $i < NUMBER_OF_ROWS); $i++) {
+			echo '<br /> i is ' . $i . ' ---2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222<br />';
+			//$key++;
+			//$i++;
+			//$negations = 0;
+			echo $v['drawertype'];
+			echo ' $key of ' . $key . ' has a total of ' . $v['total'] . '<br />';
+			
+			//echo '<pre>' . print_r($v) . '</pre>';
+			//$lastopenclose = $key[$v]['total'];
+			//$lastopenclose = $key[$i]['total'];
+			//$lastopenclose = $drawercountsarray[$i]['total'];
+			//$lastopenclose = $total;
+			//echo 'key is ' . $key . ' - lastopenclose is ' . $lastopenclose . '<br />';
+			
+				for($j = $i; (($drawercountsarray[$j]['drawertype'] == 'drawerpurchase' || $drawercountsarray[$j]['drawertype'] == 'ownersdraw' || $drawercountsarray[$j]['drawertype'] == 'deposit') && $j < NUMBER_OF_ROWS); $j++){
+					if($drawercountsarray[$j]['negations'] == 0) {
+						//$j--;
+						//$i++;
+						$l = 0;
+						//$negations += $drawercountsarray[$i]['total'];
+						echo '<br /> j is ' . $j . ' ---3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333<br />';
+						echo 'for drawertype ' . $drawercountsarray[$j]['drawertype'] . '<br />';
+						echo '&nbsp;&nbsp;&nbsp; about to increase negations by ' . $v['total'] . ' from key of ' . $key . '<br />';
+						$negations += $drawercountsarray[$j]['total'];
+						echo '$negations is ' . $negations . '<br /><br />';
+						for($k = $j; (($drawercountsarray[$k]['drawertype'] == 'drawerpurchase' || $drawercountsarray[$k]['drawertype'] == 'ownersdraw' || $drawercountsarray[$k]['drawertype'] == 'deposit') && $k >= $key);$l++, $k--){
+							echo '<br /> k is ' . $k . ' key is ' . $key . '&nbsp;---444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444<br />';
+							$drawercountsarray[$k]['negations'] = $negations;
+							//$drawercountsarray[$j]['negations'] = $negations;
+						} //end 4444444 loop
+						$drawercountsarray[$j-$l]['negations'] = $negations;
+					} //end if negations == 0					
+					//break;
+				} //end 333333333 loop
+				//$key--;
+				//$drawercountsarray[$key]['negations'] = $negations;
+				//$key++;
+				//$v['negations'] = $negations;
+			
+		} //end 22222222 loop
+			//incase loops exits because open or close set lastopenclose
+			$lastopenclose = $v['total'];
+			$drawercountsarray[[$v]['dateSortOrder']]['lastopenclose'] = $negations;
+			
+		//} while(($key[$v]['drawertype'] != 'open' && $key[$v]['drawertype'] != 'close') && $key < NUMBER_OF_ROWS);
+		//} // while(($v['drawertype'] != 'open' && $v['drawertype'] != 'close') && $key < NUMBER_OF_ROWS);
+			
+		$drawercountsarray[[$v][dateSortOrder]]['lastopenclose'] = $lastopenclose;
+		//$drawercountsarray[[$v]['dateSortOrder']]['lastopenclose'] = $negations;
+
+		
+		if(empty([$v]['lastopenclose'])){
+			//echo '<br />empty($key[$v][\'dateSortOrder\'][\'lastopenclose\']) is empty for ' . empty($key[$v]['lastopenclose']);
+		}else{
+			echo 'YESSSSSS ' . [$v]['lastopenclose'];
 		}		
 		
-		$j++;
-		//$drawercountsarray[[$j][dateSortOrder]]['drawerpulls'] = $drawerpulls;
-		$drawercountsarray[$j]['drawerpulls'] = $drawerpulls;
-	}
+		//$j++;
+		//$drawercountsarray[[$j][dateSortOrder]]['negations'] = $negations;
+		//$drawercountsarray[$j]['negations'] = $negations;
+	
+	} // end foreach loop
 	
 		echo '<pre>drawercountsarray is ' . $i;
 		print_r($drawercountsarray);
@@ -395,7 +458,7 @@ echo '</pre>';*/
 		//$i++;
 		$i = $drawerday['dateSortOrder'];
 		//$index = '';
-		$lastbalance = '';
+		$lastopenclose = '';
 		echo '<tr>';
 		//echo '<td class="id">' . $drawerday['id']. '</td>';
 		echo '<td class="id">' . $drawerday['dateSortOrder']. '</td>';
@@ -426,15 +489,15 @@ echo '</pre>';*/
 		echo '<td id="initals">' . $drawerday['initials']. '</td>';
 		echo '<td id="com">' . $drawerday['comments']. '</td>';
 		
-		$variance = $drawercountsarray[$i]['total'] - $drawercountsarray[$i]['lastbalance'] - $drawercountsarray[$i]['drawerpulls'];
+		$variance = $drawercountsarray[$i]['total'] - $drawercountsarray[$i]['lastopenclose'] - $drawercountsarray[$i]['negations'];
 		
 		$drawercountsarray[$dateSortOrder]['variance'] = $variance;
 		
 		echo '<td id="variance" bordercolor = "white">';
 	if($drawerday['drawertype'] == 'open' || $drawerday['drawertype'] == 'close'){
 			echo '<div class="variance">' . sprintf("% 8.2f", $drawercountsarray[$i]['total']) . '</div>' .				
-				' - <div class="variance">' . sprintf("% 8.2f", $drawercountsarray[$i]['lastbalance']) .  '</div>' .
-				' - <div class="variance">' . sprintf("% 8.2f", $drawercountsarray[$i]['drawerpulls']) .  '</div>' .
+				' - <div class="variance">' . sprintf("% 8.2f", $drawercountsarray[$i]['lastopenclose']) .  '</div>' .
+				' - <div class="variance">' . sprintf("% 8.2f", $drawercountsarray[$i]['negations']) .  '</div>' .
 				' = <div class="variance">' . sprintf("% 8.2f", $variance) . '</div>';	
 		echo '<td>last open/close amt</td>';
 	}
