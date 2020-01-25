@@ -1,7 +1,8 @@
 <?php
 /**
  * @bucknelius 
- *  SELECT * FROM `orders` WHERE `payment_module_code` = 'cash' AND `date_purchased` LIKE '%2018-08-07%'
+ * a cash register "drawer counter" almost like what you'd create in excel
+ * 1.24.19 fixed a few php errors
  */
 
   require('includes/application_top.php');
@@ -88,8 +89,7 @@ if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate
 						print_r($result);
 						echo '</pre>';*/						
 	  
-						$dateSortOrder++;
-																			
+						$dateSortOrder++;																			
 						$drawercountsarray[$dateSortOrder]['id'] = $result->fields['id'];
 						$drawercountsarray[$dateSortOrder]['dateSortOrderISresultloopid'] = $dateSortOrder;
 						$drawercountsarray[$dateSortOrder]['openclosearrayindex'] = ''; //initialize here for organization
