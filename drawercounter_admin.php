@@ -1,6 +1,6 @@
 <?php
 /**
- *  SELECT * FROM `orders` WHERE `payment_module_code` = 'cash' AND `date_purchased` LIKE '%2018-08-07%'
+ * *  SELECT * FROM `orders` WHERE `payment_module_code` = 'cash' AND `date_purchased` LIKE '%2018-08-07%'
  */
 
   require('includes/application_top.php');
@@ -8,7 +8,7 @@
 
   error_reporting(-1);
   
-  //define how many rows from the drawers table you'd like returned by $sql ~line 59
+  //define('STRICT_ERROR_REPORTING', true);
   define('NUMBER_OF_ROWS', 100);
   
   //$currencies = new currencies();
@@ -17,11 +17,15 @@
   $messageIdent = 0;
   $sessionMessageIdent = 1; //something not messageIdent;
 
-if(!empty($_POST)){						
+if(!empty($_POST['options'])){
+}elseif(!empty($_POST)){
 	$messageIdent = md5($_POST['drawerdate_field'] . $_POST['hundos_field'] . $_POST['twenties_field'] . $_POST['comments_field']);
 	$sessionMessageIdent = isset($_SESSION['messageIdent'])?$_SESSION['messageIdent']:'';
+    echo '<pre>';
+    print_r($_POST);
+    echo '</pre>';
 }																					   
-if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate_field'] > 1)){		//if its different:
+if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && isset($_POST['drawerdate_field']) && ($_POST['drawerdate_field'] > 1)){		//if its different:
 		$_SESSION['messageIdent'] = $messageIdent;
 			//$currencies = new currencies();
 			$drawerdate = $_POST['drawerdate_field'];
@@ -31,10 +35,28 @@ if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate
 										   
 			`drolls`, `nrolls`, `prolls`, `odcoins`, `hdcoins`, `qcoins`, `dcoins`, `ncoins`, `pcoins`, `total`, `initials`,  `comments`)
 									
-			VALUES (NULL,'" .  $_POST['drawertype_field'] . "','" .  $drawerdate . "',' " .  $_POST['hundos_field'] . "','" .  $_POST['fifties_field'] . "','" .  $_POST['twenties_field'] . "','" .  $_POST['tens_field'] . "','" .  $_POST['fives_field'] . "','" .  $_POST['twos_field'] . "','" .  $_POST['ones_field'] 
-			. "','" .  $_POST['qrolls_field'] . "','" .  $_POST['drolls_field'] . "','" .  $_POST['nrolls_field'] . "','" .  $_POST['prolls_field'] . "','" 
-			.  $_POST['odcoins_field'] . "','" .  $_POST['hdcoins_field'] . "','" .  $_POST['qcoins_field'] . "','" .  $_POST['dcoins_field'] . "','" .  $_POST['ncoins_field'] . "','" .  $_POST['pcoins_field'] . "','" 
-			.  $_POST['total_field'] . "','" .  $_POST['initials_field'] . "','" .  $_POST['comments_field'] . "')";  //$_POST['total_field'] . ")"; //build db insert query
+			VALUES (NULL,'" .  
+                    $_POST['drawertype_field'] . "','" .  $drawerdate . "',' " .  
+                    $_POST['hundos_field'] . "','" .  
+                    $_POST['fifties_field'] . "','" .  
+                    $_POST['twenties_field'] . "','" .  
+                    $_POST['tens_field'] . "','" .  
+                    $_POST['fives_field'] . "','" .  
+                    $_POST['twos_field'] . "','" .  
+                    $_POST['ones_field'] . "','" .  
+                    $_POST['qrolls_field'] . "','" .  
+                    $_POST['drolls_field'] . "','" .  
+                    $_POST['nrolls_field'] . "','" .  
+                    $_POST['prolls_field'] . "','" .  
+                    $_POST['odcoins_field'] . "','" .  
+                    $_POST['hdcoins_field'] . "','" .  
+                    $_POST['qcoins_field'] . "','" .  
+                    $_POST['dcoins_field'] . "','" .  
+                    $_POST['ncoins_field'] . "','" .  
+                    $_POST['pcoins_field'] . "','" .  
+                    $_POST['total_field'] . "','" .  
+                    $_POST['initials_field'] . "','" .  
+                    $_POST['comments_field'] . "')";  //$_POST['total_field'] . ")"; //build db insert query
 			
 			if ($db->Execute($updatesql) == TRUE) { // triple = is identical to and of the same type
 				echo "New record created successfully";
@@ -42,27 +64,34 @@ if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate
 				echo "Error: " . $updatesql . "<br>" . $con->error;}
 			unset($_POST); //clear $_POST
 
-	}/*elseif(!empty($_POST)){
-		/*echo $messageIdent . '<br />' .
-			 $sessionMessageIdent . '<br />' .
-				'did not match';*/
-		/*var_dump($messageIdent);
-		echo '<br />';
-		var_dump($sessionMessageIdent);
-		echo '<br />messageIdent comparison ' . ($messageIdent!=$sessionMessageIdent) . '<br />';
-		echo '!emptyt post ' . (!empty($_POST));
-	}else{
-		echo 'messageIdent weirdness';
-	}*/
+	}
+		if(isset($_POST['options']['date']['from'])){
+			$date_from = str_replace('T', ' ', $_POST['options']['date']['from']);
+			$date_to = str_replace('T', ' ', $_POST['options']['date']['to']);
+		}		
+        $sql_start = "SELECT *  
+				FROM `drawers` ";
 
-	global $db;
-	$sql =  'SELECT * FROM `drawers` ORDER By `drawerdate` DESC	LIMIT ' . NUMBER_OF_ROWS;
+if(!empty($_POST['options']['date']['from'])){
+	$sql_date = 
+				"WHERE `drawerdate` 
+				BETWEEN '" . $date_from . "'
+				AND '" . $date_to . "' AND ";
+		}else{
+			$sql_date = " WHERE ";
+		}
+		if(isset($_POST['options']['comments'])){
+			$sql_comments = " comments LIKE '%" . $_POST['options']['comments'] . "%' ";
+		}
+
+			$sql_end = "ORDER BY `drawerdate` DESC;";
+			$sql = $sql_start . $sql_date . $sql_comments . $sql_end;
+            echo $sql;
+    }else{
+	    $sql =  'SELECT * FROM `drawers` ORDER By `drawerdate` DESC'; //	LIMIT ' . NUMBER_OF_ROWS;
+    }
 	$drawercountsarray = array();
-	$result = $db->Execute($sql);
-	/*echo '<pre>';
-	echo '$result is ' . print_r($result);
-	echo '</pre>';*/ //$result is an object
-	
+	$result = $db->Execute($sql);	
 	if ($result->RecordCount() > 0) //within foreach($exp_by_ln as $exl)
 		  {
 			  $dateSortOrder = 0;
@@ -85,8 +114,7 @@ if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate
 						print_r($result);
 						echo '</pre>';*/						
 	  
-						$dateSortOrder++;
-																			
+						$dateSortOrder++;																			
 						$drawercountsarray[$dateSortOrder]['id'] = $result->fields['id'];
 						$drawercountsarray[$dateSortOrder]['dateSortOrderISresultloopid'] = $dateSortOrder;
 						$drawercountsarray[$dateSortOrder]['openclosearrayindex'] = ''; //initialize here for organization
@@ -113,12 +141,10 @@ if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate
 						$drawercountsarray[$dateSortOrder]['pcoins'] = $result->fields['pcoins'];
 						$drawercountsarray[$dateSortOrder]['total'] = $result->fields['total'];
 						$drawercountsarray[$dateSortOrder]['initials'] = $result->fields['initials'];
-						$drawercountsarray[$dateSortOrder]['comments'] = $result->fields['comments']; //
-						$drawercountsarray[$dateSortOrder]['lastopenclose'] = '';						
+						$drawercountsarray[$dateSortOrder]['comments'] = $result->fields['comments'];
+						$drawercountsarray[$dateSortOrder]['lastopenclose'] = '';
 						$drawercountsarray[$dateSortOrder]['variance'] = ''; // place holder $variance not defined yet
 					if($drawercountsarray[$dateSortOrder]['drawertype'] == 'open' || $drawercountsarray[$dateSortOrder]['drawertype'] == 'close'){
-						//$openclosearray[] = $result->fields['total'];
-						//$openclosearray = $dateSortOrder;
 						$opencloseindex++;
 						$openclosearray[$opencloseindex]['total'] = $result->fields['total'];
 						$openclosearray[$opencloseindex]['drawerdate'] = $result->fields['drawerdate'];
@@ -126,9 +152,7 @@ if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate
 						$openclosearray[$opencloseindex]['dateSortOrder'] = $dateSortOrder;
 						$negations = 0; //reset here
 						$contributions = 0; //reset here
-						$notOpenCloseCount = 0;
-						//$opencloseindex--;
-						
+						$notOpenCloseCount = 0;						
 					}elseif($result->fields['drawertype'] == 'ownerscontribution' || $result->fields['drawertype'] == 'cashsales' || $result->fields['drawertype'] == 'qbcashsales' || $result->fields['drawertype'] == 'hwcashsales' || $result->fields['drawertype'] == 'other'){
 						$notOpenCloseCount++;
 						$contributions += $result->fields['total'];
@@ -141,17 +165,14 @@ if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate
 						$drawercountsarray[(($dateSortOrder-$notOpenCloseCount) > 1) ? $dateSortOrder-$notOpenCloseCount : 1]['contributions'] = $contributions;
 					}else{
 						$drawercountsarray[$dateSortOrder]['flagdat'] = 'flag-ated';
-						//$drawercountsarray[$dateSortOrder-1]['contributions'] = $contributions;
-						//$drawercountsarray[$dateSortOrder-1]['negations'] = $negations;
 					}
 					
 						$drawercountsarray[$dateSortOrder]['openclosearrayindex'] = $opencloseindex;
-						//echo 'turd ' . $i++ . '</br>';						
-						$result -> MoveNext (); //new for zen-cart db // Does not... //works w/ old db connection
+						$result -> MoveNext ();
 					} //close while
 		  } else {
 			echo '<p>Sorry, nothing found.</p>';
-		}					  
+		}		  
 ?>
 
 <!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -165,9 +186,14 @@ if(($messageIdent!=$sessionMessageIdent) && isset($_POST) && ($_POST['drawerdate
 <script language="javascript" src="includes/general.js"></script>
 <script language="javascript">
 function totalit(){
+	//alert("hi there");
+	//alert((document.getElementById("hundos").value*100) + " is type " + typeof (reduce(document.getElementById("hundos"))));
 	totalval = parseFloat(0);
-	totalval += parseFloat(document.getElementById("hundos").value*100 || 0);
-	totalval += parseFloat(document.getElementById("fifties").value*50 || 0);
+	//alert("1 type of " + typeof(totalval));
+	totalval += parseFloat(document.getElementById("hundos").value*100 || 0); // ? parseFloat(document.getElementById("hundos").value)*100 : NaN);
+	//alert("2 type of " + typeof(totalval));
+	totalval += parseFloat(document.getElementById("fifties").value*50 || 0); // ? parseFloat(document.getElementById("fifties").value)*50 : NaN); //+
+	//alert("3 type of " + typeof(totalval));
 	totalval += parseFloat(document.getElementById("twenties").value*20 || 0);
 	totalval += parseFloat(document.getElementById("tens").value*10 || 0);
 	totalval += parseFloat(document.getElementById("fives").value*5 || 0);
@@ -182,17 +208,18 @@ function totalit(){
 	totalval += parseFloat(document.getElementById("qcoins").value*.25 || 0);
 	totalval += parseFloat(document.getElementById("dcoins").value*.10 || 0);
 	totalval += parseFloat(document.getElementById("ncoins").value*.05 || 0);
-	totalval += parseFloat(document.getElementById("pcoins").value*.01 || 0);
+	totalval += parseFloat(document.getElementById("pcoins").value*.01 || 0); 
+	//totalval = hundosval+fiftiesval;
 	document.getElementById("total").value = totalval.toFixed(2);				   
 }
 </script>
 <style>
-	.alerts-border {
-		border: 1px #ff0000 solid;    
-		animation: blink 1s;
-		animation-iteration-count: 10;
-	}
-	@keyframes blink { 50% { border-color:#fff ; }  }
+    .alerts-border {
+        border: 1px #ff0000 solid;    
+        animation: blink 1s;
+        animation-iteration-count: 10;
+    }
+    @keyframes blink { 50% { border-color:#fff ; }  }
 </style>
 </head>
 <body onLoad="init()">
@@ -202,7 +229,15 @@ function totalit(){
 <!-- body //-->
 <p id="finalcountdown" align="center"></p>
 
-<form action="" method="post">							  
+<form action="" method="post">
+    <input type="datetime-local" name= "options[date][from]">
+    <input type="datetime-local" name= "options[date][to]">
+    <?php 
+        echo 'comments: '  . zen_draw_input_field('options[comments]', '', 'style="width:300px"');
+    ?>
+    <button type="submit">Update Date Range</button>
+</form>
+<form action="" method="post">
 <table class="table" name="table2" border="1" style="width: 3500px;" cellspacing="0" cellpadding="0">
 <tbody>
 
@@ -214,7 +249,6 @@ function totalit(){
 
 <script>
 // Set the date we're counting down to
-
 	var countDownDate = new Date();
 	countDownDate.setSeconds(countDownDate.getSeconds() + 900);
 	// Update the count down every 1 second
@@ -262,8 +296,6 @@ $(document).keydown(
 			//alert().nextAll('input');            
 			
 			$(".move:focus").parent().next().find('input').focus(); 
-   
-
         }
         if (e.keyCode == 37) {      
             $(".move:focus").parent().prev().find('input').focus();
@@ -411,6 +443,7 @@ echo '</pre>';*/
 		$drawercountsarray[$key]['lastOpenCloseIndex2ndloop'] = $lastOpenCloseIndex;
 		$drawercountsarray[$key]['opencloseindex2ndloop'] = $opencloseindex;
 		$drawercountsarray[$key]['lastopenclose'] = (!empty($openclosearray[$drawercountsarray[$key]['openclosearrayindex']+1]['total']) ? $openclosearray[$drawercountsarray[$key]['openclosearrayindex']+1]['total'] : ''); //will throw Undefined offset: on last loop without ternary op
+		//$drawercountsarray[$key]['lastopenclose'] = 100;
 		$drawercountsarray[$key]['nextopenclose'] = (!empty($openclosearray[$drawercountsarray[$key]['openclosearrayindex']+1]['total']) ? $openclosearray[$drawercountsarray[$key]['openclosearrayindex']+1]['total'] : ''); //will throw Undefined offset: on last loop
 		$sd = $drawercountsarray[$key]['drawerdate'];
 		$ed = $drawercountsarray[$key]['lastopenclosedate'];
@@ -427,14 +460,18 @@ echo '</pre>';*/
 		}else{
 			echo ' key was not greater than zero <br />';
 		}
+  
+		
+
 		//increment counters
 		$lastOpenCloseIndex++;
 		$opencloseindex++;	
 	} // close if open close
 	
+		//$drawercountsarray[$key]['lastOpenCloseIndex2ndloop'] = $lastOpenCloseIndex;
 	} // end foreach loop*/
-				
- 		//echo '<pre>$v is ' . $i;
+
+		//echo '<pre>$v is ' . $i;
 		//var_dump($v);
 		//echo '</pre>';
 
@@ -447,12 +484,25 @@ echo '</pre>';*/
 	//#########################################################################################################################################
 	
 	foreach($drawercountsarray as $drawerday){
+	//foreach($drawercountsarray as $drawerday => $value){ //doesn't work
+	//foreach($drawercountsarray as $drawercountday){ //how it was
+		
+		//first loop sets lastopenclose
+		//second loop sets sales data in array
+		//third loop calculates variance and outputs html table
+		
+		//$variance = $drawerday['total'] + $drawerday['negations'] - $drawerday['contributions'] - $drawerday['rangeordersum'] - $lastopenclose;
+		
+		//$variance = $drawerday['total'] + $drawerday['negations'] - $drawerday['contributions'] - $drawerday['rangeordersum'] - $drawerday['lastopenclose'];
 		$variance = (
 			(!empty($drawerday['total']) 		 ? $drawerday['total'] 			: 0) + 
 			(!empty($drawerday['negations']) 	 ? $drawerday['negations'] 		: 0) - 
 			(!empty($drawerday['contributions']) ? $drawerday['contributions'] : 0) - 
 			(!empty($drawerday['rangeordersum']) ? $drawerday['rangeordersum'] : 0) - 			
 			(!empty($drawerday['lastopenclose']) ? $drawerday['lastopenclose'] : 0));
+		
+		//$drawercountsarray['varmath'] = $drawerday['total'] . ' + ' . $drawerday['negations'] . ' - ' . $drawerday['contributions'] . ' - ' . $drawerday['rangeordersum'] . ' - ' . $drawerday['lastopenclose'] . ' for ' . $drawerday;
+		
 		
 		$drawercountsarray['varmath'] = (
 			(!empty($drawerday['total']) ? $drawerday['total'] : 0) . ' + ' . 
@@ -462,6 +512,7 @@ echo '</pre>';*/
 			(!empty($drawerday['lastopenclose']) ? $drawerday['lastopenclose'] : 0) . ' for ' . 
 			(!empty($drawerday)));
 		
+		//$varmath 					  = '(' . $drawerday['total'] . ' + ' . $drawerday['negations'] . ' - ' . $drawerday['contributions'] . ' - ' . $drawerday['rangeordersum'] . ' - ' . $drawerday['lastopenclose'] . ')' ; //. ' for ' . $drawerday;
 		$varmath 					  = '(' . 
 		(!empty($drawerday['total']) ? $drawerday['total'] : 0) . ' + ' . 
 		(!empty($drawerday['negations']) ? $drawerday['negations'] : 0) . ' - ' . 
@@ -478,6 +529,8 @@ echo '</pre>';*/
 		$dayofweek = date('w', strtotime($drawerday['drawerdate']));
 		$days = array('Sunday', 'Monday', 'Tuesday', 'Wednesday','Thursday','Friday', 'Saturday');
 		echo '<td class="date"> <div class="date" style="text-align: left; width:50px;">' . $days[$dayofweek] . '</div>           <div class="date"> ' . zen_datetime_long($drawerday['drawerdate']). '</div></td>';
+		//$dayofweek = date('w', strtotime($drawerday['drawerdate']));
+		//$dayofweek    = date('Y-m-d', strtotime(($day - $dayofweek).' day', strtotime($date)));
 		echo '<td class="billnums nums" id="two">' . $drawerday['twos']. '</td>';
 		echo '<td class="billnums nums" id="hun">' . $drawerday['hundos']. '</td>';
 		echo '<td class="billnums nums" id="fif">' . $drawerday['fifties']. '</td>';
@@ -497,11 +550,9 @@ echo '</pre>';*/
 		echo '<td class="coinnums nums" id="pc">' . $drawerday['pcoins']. '</td>';
 		echo '<td id="tot">' . $drawerday['total']. '</td>';
 		echo '<td id="initals">' . $drawerday['initials']. '</td>';
-  
-  
- 		echo '<td id="com">' . $drawerday['comments']. '</td>';
+		echo '<td id="com">' . $drawerday['comments']. '</td>';
+//		echo '<td id="variance" bordercolor = "white">';
 	if($drawerday['drawertype'] == 'open' || $drawerday['drawertype'] == 'close'){
-		
 			if($variance > 1000){
 				echo '<td id="variance"  style="background-color: rgba(0, 255, 0, 1);">';
 				echo	'<div class="variance">' . sprintf("% 8.2f", $variance) . '<br />';	
@@ -543,16 +594,14 @@ echo '</pre>';*/
 			}elseif(($variance) > -500){
 				echo '<td id="variance">';
 				echo	'<div class="variance" style="background-color: rgba(255, 0, 0, 0.75);">' . $variance . '<br />';	
-		  
-		 
-							 
 			}else{
 				echo '<td id="variance">';
 				//echo '<td id="variance">';
 				echo	'<div class="variance" style="background-color: rgba(255, 0, 0, 1);">' . $variance . '<br />';	
 			}																			 
 			echo	'<div class="variance">' . $varmath . '<br />';	
-			echo '<td>' . $drawerday['total'] . '</td>'; //for base column	echo '<td>' . $drawerday['rangeordersum'] . '</td>'; //for sales column
+			echo '<td>' . $drawerday['total'] . '</td>'; //for base column
+		echo '<td>' . $drawerday['rangeordersum'] . '</td>'; //for sales column
 		echo '<td>' . (!empty($drawerday['contributions']) ? $drawerday['contributions'] : '') . '</td>'; //for contributions column
 									 
   
@@ -564,12 +613,7 @@ echo '</pre>';*/
 			$end_date = 'EMPTY';
 			$start_date = 'EMPTY';
 		}
-		/*
-		2018-12-17
-		12 %2F 17 %2F 2018
-												   
-																									
-			*/
+		
 		if($drawerday['rangeordersum'] > 0){
 			echo '<td><a href="' . DIR_WS_ADMIN . 'stats_sales_report.php?start_date=' . $start_date . '&end_date=' . $end_date . '&date_target=purchased&date_status=1&prod_includes=&cust_includes=&payment_method=cash&payment_method_omit=&current_status=&manufacturer=0&timeframe=year&timeframe_sort=asc&detail_level=order&li_sort_a=oID&li_sort_order_a=asc&li_sort_b=oID&li_sort_order_b=asc&output_format=display&new_window=1">sales report</a><br />';
 			echo '<br />' . str_replace("%2F", "/", $start_date) . '<br />';
@@ -600,7 +644,7 @@ echo '<tr><td></td><td colspan = "100%">Brian moved the input fields to the top 
   </tbody>
 </table>
 <!-- body_eof //-->
-	 
+
 <style>
     .table {
         display: block;
@@ -628,8 +672,8 @@ echo '<tr><td></td><td colspan = "100%">Brian moved the input fields to the top 
 		max-width: 1%;
 	}
 	.drawertype{
-		 
-		max-width: 4%;
+		width: 
+		max-width: 550px;
 	}
 	.date {
 		padding: 0px !important;		
@@ -668,12 +712,12 @@ echo '<tr><td></td><td colspan = "100%">Brian moved the input fields to the top 
 	.billnums{
 		padding: 0px !important;
 		padding-top: 12px !important;
-		background-color: #85bb65 ;
+		background: #85bb65 ;
 	}
 	.coinnums{
 		padding: 0px !important;
 		padding-top: 12px !important;
-		background-color: silver;
+		background: silver;
 		max-width: 4%;
 	}
 	div.variance{
@@ -711,7 +755,7 @@ echo '<tr><td></td><td colspan = "100%">Brian moved the input fields to the top 
   td:nth-child(3), th:nth-child(3) { width: @column_three_width; }
 
   thead {
-    background-color: @header_background_color;
+    background: @header_background_color;
     color: @header_text_color;
     tr {
       display: block;
@@ -724,7 +768,7 @@ echo '<tr><td></td><td colspan = "100%">Brian moved the input fields to the top 
     width: 100%;
     height: @table_body_height;
     tr:nth-child(even) {
-      background-color: @alternate_row_background_color;
+      background: @alternate_row_background_color;
     }
   }
 }
