@@ -25,9 +25,9 @@ Move html outside of PHP tags
 
 use absolute values of types to force intended math
 
-admin interface w/ CRUD ability
-    current work around is phpmyadmin
-refactor as object-oriented
+admin interface w/ CRUD ability<br>
+    current work around is phpmyadmin<br>
+refactor as object-oriented<br>
 
-Improve appearance of table(s)/headers
+Improve appearance of table(s)/headers<br>
 Improve page refresh/$_POST data form submit handling
