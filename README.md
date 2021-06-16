@@ -21,6 +21,8 @@
 # Updated: color coded "heat-mapped w/ opacity" variance (deeper the red the more it's short; darker the green > more it's over)
 
 # TODO:
+Consider rebuild w/ abstract object class instead of associative array mashing
+
 Move html outside of PHP tags
 
 use absolute values of types to force intended math
